@@ -1,7 +1,6 @@
 // pages/index.js
 import { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
-import '../styles/globals.css';
 
 export default function Home(){
   const endpoints = {
