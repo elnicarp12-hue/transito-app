@@ -1,11 +1,16 @@
-export default async function handler(req, res) {
-  const apiKey = process.env.API_KEY_TRANSPORTE;
+import fetch from "node-fetch";
 
+export default async function handler(req, res) {
   try {
-    const response = await fetch(`https://apitransporte.buenosaires.gob.ar/subtes?client_id=${apiKey}`);
+    const apiKey = process.env.SUBTE_API_KEY;
+    const response = await fetch(
+      `https://api.buenosaires.gob.ar/subte?api_key=${apiKey}`
+    );
+
     const data = await response.json();
     res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener datos de subtes" });
+    console.error(error);
+    res.status(500).json({ error: "No se pudo obtener el estado de subtes." });
   }
 }
