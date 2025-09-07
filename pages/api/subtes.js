@@ -1,21 +1,11 @@
-import * as cheerio from "cheerio";
-
 export default async function handler(req, res) {
+  const apiKey = process.env.API_KEY_TRANSPORTE;
+
   try {
-    const response = await fetch("https://www.subte.com.ar/");
-    const html = await response.text();
-    const $ = cheerio.load(html);
-
-    const subtes = [];
-    $(".estado-linea").each((i, el) => {
-      subtes.push({
-        linea: $(el).find(".nombre-linea").text().trim(),
-        estado: $(el).find(".texto-estado").text().trim(),
-      });
-    });
-
-    res.status(200).json({ subtes });
+    const response = await fetch(`https://apitransporte.buenosaires.gob.ar/subtes?client_id=${apiKey}`);
+    const data = await response.json();
+    res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener subtes", detalle: error.message });
+    res.status(500).json({ error: "Error al obtener datos de subtes" });
   }
 }
