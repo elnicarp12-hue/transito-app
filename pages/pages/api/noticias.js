@@ -1,24 +1,18 @@
-// pages/api/noticias.js
-import fetch from 'node-fetch';
+export default async function handler(req, res) {
+  try {
+    const response = await fetch("https://api.currentsapi.services/v1/latest-news?language=es", {
+      headers: {
+        Authorization: `Bearer TU_API_KEY` // ⚠️ reemplazá con tu API key real
+      }
+    });
 
-export default async function handler(req, res){
-  const key = process.env.NEWSAPI_KEY || '';
-  if(!key){
-    // fallback demo
-    return res.json([{ texto: "[URGENTE] Demo: NewsAPI no configurada", alerta: true }]);
-  }
+    if (!response.ok) {
+      throw new Error("Error al obtener noticias");
+    }
 
-  const url = `https://newsapi.org/v2/top-headlines?country=ar&pageSize=8&apiKey=${key}`;
-  try{
-    const r = await fetch(url);
-    if(!r.ok) throw new Error('newsapi');
-    const j = await r.json();
-    const out = (j.articles || []).map(a => ({
-      texto: `[URGENTE] ${a.title}`,
-      alerta: true
-    }));
-    return res.json(out);
-  }catch(e){
-    return res.json([{ texto: "[URGENTE] Error cargando noticias", alerta: true }]);
+    const data = await response.json();
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }
