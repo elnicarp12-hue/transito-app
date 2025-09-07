@@ -1,26 +1,16 @@
-import Parser from "rss-parser";
+import fetch from "node-fetch";
 
 export default async function handler(req, res) {
-  const parser = new Parser();
-  const feeds = [
-    "https://www.clarin.com/rss/lo-ultimo/",
-    "https://www.pagina12.com.ar/rss/portada",
-    "https://www.lanacion.com.ar/rss/canal/ultimas-noticias/"
-  ];
-
   try {
-    let noticias = [];
-    for (const url of feeds) {
-      const feed = await parser.parseURL(url);
-      noticias = noticias.concat(feed.items.map(item => ({
-        titulo: item.title,
-        link: item.link,
-        fuente: feed.title
-      })));
-    }
+    const apiKey = process.env.NEWS_API_KEY;
+    const response = await fetch(
+      `https://newsapi.org/v2/top-headlines?country=ar&apiKey=${apiKey}`
+    );
 
-    res.status(200).json(noticias.slice(0, 20)); // primeras 20
+    const data = await response.json();
+    res.status(200).json(data.articles);
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener noticias" });
+    console.error(error);
+    res.status(500).json({ error: "No se pudo obtener las noticias." });
   }
 }
