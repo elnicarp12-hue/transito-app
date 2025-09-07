@@ -1,21 +1,11 @@
-import * as cheerio from "cheerio";
-
 export default async function handler(req, res) {
+  const apiKey = process.env.API_KEY_TRANSPORTE;
+
   try {
-    const response = await fetch("https://www.argentina.gob.ar/noticias/transito");
-    const html = await response.text();
-    const $ = cheerio.load(html);
-
-    const transito = [];
-    $(".views-row").each((i, el) => {
-      transito.push({
-        titulo: $(el).find("h2").text().trim(),
-        link: "https://www.argentina.gob.ar" + $(el).find("a").attr("href"),
-      });
-    });
-
-    res.status(200).json({ transito });
+    const response = await fetch(`https://apitransporte.buenosaires.gob.ar/transito/v1/estadoDeCalles?client_id=${apiKey}`);
+    const data = await response.json();
+    res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener tránsito", detalle: error.message });
+    res.status(500).json({ error: "Error al obtener datos de tránsito" });
   }
 }
