@@ -1,21 +1,11 @@
-import * as cheerio from "cheerio";
-
 export default async function handler(req, res) {
+  const apiKey = process.env.API_KEY_TRANSPORTE;
+
   try {
-    const response = await fetch("https://www.argentina.gob.ar/transporte/trenes-argentinos");
-    const html = await response.text();
-    const $ = cheerio.load(html);
-
-    const trenes = [];
-    $("table tbody tr").each((i, el) => {
-      trenes.push({
-        ramal: $(el).find("td").eq(0).text().trim(),
-        estado: $(el).find("td").eq(1).text().trim(),
-      });
-    });
-
-    res.status(200).json({ trenes });
+    const response = await fetch(`https://apitransporte.buenosaires.gob.ar/trenes?client_id=${apiKey}`);
+    const data = await response.json();
+    res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener trenes", detalle: error.message });
+    res.status(500).json({ error: "Error al obtener datos de trenes" });
   }
 }
